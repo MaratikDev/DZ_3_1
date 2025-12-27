@@ -8,8 +8,10 @@
 #include "SetGraph.h"
 
 void PrintAllEdges(const IGraph& graph);
-void BFS(const IGraph& graph, int start);
-void DFS(const IGraph& graph, int start);
+void BFS(const IGraph &graph, int vertex, std::vector<bool> &visited, const std::function<void(int)> &func);
+void mainBFS(const IGraph &graph, const std::function<void(int)> &func);
+void DFS(const IGraph &graph, int vertex, std::vector<bool> &visited, const std::function<void(int)> &func);
+void mainDFS(const IGraph &graph, const std::function<void(int)> &func);
 
 int main() {
 
@@ -49,35 +51,35 @@ int main() {
 
 
     std::cout << "BFS listGraph: ";
-    BFS(listGraph, 0);
+    mainBFS(listGraph,[](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n";
 
     std::cout << "DFS listGraph: ";
-    DFS(listGraph, 0);
+    mainDFS(listGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n\n";
 
     std::cout << "BFS matrixGraph: ";
-    BFS(matrixGraph, 0);
+    mainBFS(matrixGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n";
 
     std::cout << "DFS matrixGraph: ";
-    DFS(matrixGraph, 0);
+    mainDFS(matrixGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n\n";
 
     std::cout << "BFS arcGraph: ";
-    BFS(arcGraph, 0);
+    mainBFS(arcGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n";
 
     std::cout << "DFS arcGraph: ";
-    DFS(arcGraph, 0);
+    mainDFS(arcGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n\n";
 
     std::cout << "BFS setGraph: ";
-    BFS(setGraph, 0);
+    mainBFS(setGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n";
 
     std::cout << "DFS setGraph: ";
-    DFS(setGraph, 0);
+    mainDFS(setGraph, [](int vertex){ std::cout << vertex << " "; });
     std::cout << "\n\n";
 
     return 0;
@@ -98,46 +100,68 @@ void PrintAllEdges(const IGraph& graph)
     std::cout << std::endl;
 }
 
-void BFS(const IGraph& graph, int start)
+void BFS(const IGraph &graph, int vertex, std::vector<bool> &visited, const std::function<void(int)> &func)
 {
-    int n = graph.VerticesCount();
-    std::vector visited(n, 0);
-    std::queue<int> q;
+    std::queue<int> qu;
+    qu.push(vertex);
+    visited[vertex] = true;
 
-    visited[start] = 1;
-    q.push(start);
+    while (!qu.empty())
+    {
+        int currentVertex = qu.front();
+        qu.pop();
 
-    while (!q.empty()) {
-        int v = q.front();
-        q.pop();
-       std::cout << v << " ";
+        func(currentVertex);
 
-        for (int to : graph.GetNextVertices(v)) {
-            if (!visited[to]) {
-                visited[to] = 1;
-                q.push(to);
+        for (int nextVertex: graph.GetNextVertices(currentVertex))
+        {
+            if (!visited[nextVertex])
+            {
+                visited[nextVertex] = true;
+                qu.push(nextVertex);
             }
         }
     }
 }
 
-void DFS(const IGraph& graph, int start)
+void mainBFS(const IGraph &graph, const std::function<void(int)> &func)
 {
-    int n = graph.VerticesCount();
-    std::vector<bool> visited(n, 0);
+    std::vector<bool> visited(graph.VerticesCount(), false);
 
-    std::function<void(int)> dfs = [&](int v) {
-        visited[v] = 1;
-        std::cout << v << " ";
-
-        for (int to : graph.GetNextVertices(v)) {
-            if (!visited[to]) {
-                dfs(to);
-            }
+    for (int i = 0; i < graph.VerticesCount(); ++i)
+    {
+        if (!visited[i])
+        {
+            BFS(graph, i, visited, func);
         }
-    };
+    }
+}
 
-    dfs(start);
+void DFS(const IGraph &graph, int vertex, std::vector<bool> &visited, const std::function<void(int)> &func)
+{
+    visited[vertex] = true;
+    func(vertex);
+
+    for (int nextVertex: graph.GetNextVertices(vertex))
+    {
+        if (!visited[nextVertex])
+        {
+            DFS(graph, nextVertex, visited, func);
+        }
+    }
+}
+
+void mainDFS(const IGraph &graph, const std::function<void(int)> &func)
+{
+    std::vector<bool> visited(graph.VerticesCount(), false);
+
+    for (int i = 0; i < graph.VerticesCount(); ++i)
+    {
+        if (!visited[i])
+        {
+            DFS(graph, i, visited, func);
+        }
+    }
 }
 
 

@@ -12,6 +12,7 @@ public:
     explicit ListGraph(int vertices);
     ListGraph(const IGraph& graph);
 
+
     void AddEdge(int from, int to) override;
     int VerticesCount() const override;
 

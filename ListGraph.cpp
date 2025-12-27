@@ -12,6 +12,7 @@ ListGraph::ListGraph(const IGraph& graph)
     }
 }
 
+
 void ListGraph::AddEdge(int from, int to) {
     adjacency[from].push_back(to);
 }
